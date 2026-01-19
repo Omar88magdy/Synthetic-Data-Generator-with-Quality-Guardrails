@@ -236,25 +236,6 @@ Quality Statistics:
 6. **Training Specialist** (expert, 15%) - Workflow efficiency and quality
 7. **Lecturer/Learning Designer** (expert, 10%) - Planning and organization
 
-
-
-### Multi-Provider Architecture
-- **Rationale**: Reduces single-point-of-failure and enables cost optimization
-- **Trade-off**: Added complexity vs robustness and comparison capability
-
-### Quality-First Approach  
-- **Rationale**: Ensures high-quality output through automated guardrails
-- **Trade-off**: Slower generation vs guaranteed quality standards
-
-### Configuration-Driven Design
-- **Rationale**: Maximum flexibility without code changes
-- **Trade-off**: Complex config vs ease of experimentation
-
-### Real Review Comparison
-- **Rationale**: Provides objective quality assessment baseline
-- **Trade-off**: Manual curation effort vs validation accuracy
-## 📚 Resources
-
 ### Dependencies Used
 - [OpenAI API](https://openai.com/api/) - GPT-4o-mini model provider
 - [DeepSeek API](https://api.deepseek.com) - DeepSeek chat model provider
