@@ -4,35 +4,38 @@ A production-ready system that generates **synthetic service/tool reviews** usin
 
 ## 🚀 Features
 
-- **Multi-LLM Generation**: Supports OpenAI and Ollama model providers
+- **Multi-LLM Generation**: Supports OpenAI GPT-4o-mini and DeepSeek API providers
+- **Progressive Quality Scaling**: Dynamic quality thresholds that scale with dataset size
 - **Quality Guardrails**: Automated diversity, bias detection, and realism checks  
-- **Persona-Driven**: Configurable user personas with different experience levels and tones
+- **Persona-Driven**: 8 configurable user personas with different experience levels and tones
 - **Automatic Regeneration**: Failed reviews are automatically regenerated until quality thresholds are met
 - **Real vs Synthetic Comparison**: Comprehensive analysis against real-world review data
 - **Detailed Reporting**: Markdown reports with quality metrics and recommendations
-- **CLI Interface**: Easy-to-use command-line interface
+- **Enhanced CLI Interface**: Visual progress bars and clean logging output
 - **YAML Configuration**: All behavior is configurable, no hardcoded values
+- **Robust Error Handling**: Graceful handling of API failures and None review cases
 
 ## 📊 Sample Output
 
-The system generates reviews like these:
+The system generates Easygenerator reviews like these:
 
-**Synthetic Review (4/5 stars, Senior Developer persona):**
-> "We've been using this API gateway for 6 months and it handles our microservices traffic well. The rate limiting is configurable and integrates smoothly with our Kubernetes deployment. Documentation could be more comprehensive for advanced configurations, but the basic setup was straightforward. Performance has been solid with sub-100ms latency for most requests."
+**Synthetic Review (5/5 stars, H&S Coordinator persona):**
+> "Easygenerator has been a game-changer for our training team. The intuitive interface made it easy to create professional courses without any design background. The collaboration features work seamlessly, allowing our team to provide feedback in real-time. SCORM integration with our LMS was effortless, and our learners have responded positively to the interactive content."
 
 **Quality Scores:**
 - Realism: 0.847
 - Diversity: 0.923  
-- Bias: Low
-- Domain Relevance: 0.912
+- Persona Alignment: 0.8
+- Domain Relevance: 0.85
 
 ## 🛠️ Installation
 
 ### Prerequisites
 
-- Python 3.8 or higher
-- OpenAI API key (optional, for OpenAI provider)
-- Ollama installed locally (optional, for local LLM provider)
+- Python 3.13+ (tested with 3.13.2)
+- OpenAI API key (required for gpt-4o-mini provider)
+- DeepSeek API key (required for deepseek-chat provider)
+- 4GB+ RAM for semantic similarity calculations
 
 ### Setup
 
@@ -53,15 +56,10 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. **Configure API keys (optional):**
+4. **Configure API keys:**
 ```bash
 export OPENAI_API_KEY="your-openai-api-key-here"
-```
-
-5. **Set up Ollama (optional):**
-```bash
-# Install Ollama from https://ollama.ai
-ollama pull llama2  # or your preferred model
+export DEEPSEEK_API_KEY="your-deepseek-api-key-here"
 ```
 
 ## 📋 Configuration
@@ -73,49 +71,52 @@ The system is driven by `config/generator.yaml`. Key sections:
 models:
   openai:
     enabled: true
-    model: "gpt-3.5-turbo"
-    temperature: 0.8
-    weight: 0.6
+    model: "gpt-4o-mini"
+    temperature: 0.9
+    max_tokens: 500
+    weight: 0.6  # 60% of reviews
     
-  ollama:
+  deepseek:
     enabled: true
-    model: "llama2" 
-    weight: 0.4
+    model: "deepseek-chat"
+    temperature: 0.8
+    max_tokens: 500
+    weight: 0.4  # 40% of reviews
 ```
 
-### Personas
+### Generation Settings
 ```yaml
-personas:
-  - role: "Senior Developer"
-    experience: "expert"
-    tone: "analytical"
-    characteristics:
-      - "Technical depth in reviews"
-      - "Focus on performance and scalability"
-    weight: 0.25
+generation:
+  target_reviews: 200     # Target number of reviews to generate
+  batch_size: 30          # Reviews per batch for quality control
+  min_reviews: 5          # Minimum acceptable reviews
 ```
 
-### Quality Thresholds
+### Progressive Quality Thresholds
 ```yaml
 quality_thresholds:
-  max_jaccard_similarity: 0.3      # Vocabulary overlap limit
-  max_semantic_similarity: 0.85    # Semantic similarity limit
-  min_domain_keywords: 2           # Required domain keywords
-  min_quality_score: 0.6           # Overall quality threshold
+  # Progressive scaling based on corpus size
+  max_jaccard_similarity: 0.45     # Base threshold (scales 1.0x-1.5x)
+  max_semantic_similarity: 0.85     # Base threshold (scales 1.0x-1.5x)  
+  min_domain_keywords: 2            # Required domain keywords per review
+  min_quality_score: 0.6            # Overall composite quality threshold
+  
+# Note: Thresholds automatically scale from 1.0x (small corpus) 
+# to 1.5x (200+ reviews) to accommodate natural similarity increases
 ```
 
 ## 🖥️ Usage
 
 ### Basic Commands
 
-**Generate synthetic reviews:**
+**Generate 200 synthetic Easygenerator reviews:**
 ```bash
-python cli.py generate --config config/generator.yaml
+python cli.py generate
 ```
 
 **Generate quality report:**
 ```bash
-python cli.py report --config config/generator.yaml
+python cli.py report
 ```
 
 **Validate configuration:**
@@ -125,24 +126,19 @@ python cli.py validate --config config/generator.yaml
 
 **Show system info:**
 ```bash
-python cli.py info --config config/generator.yaml
+python cli.py info
 ```
 
 ### Advanced Usage
 
-**Generate without quality control (faster):**
+**Generate without quality control (faster, for testing):**
 ```bash
-python cli.py generate --config config/generator.yaml --no-quality-control
+python cli.py generate --no-quality-control
 ```
 
-**Custom report paths:**
+**Debug mode with verbose logging:**
 ```bash
-python cli.py report --synthetic-file data/my_reviews.json --real-file data/real_reviews.json --output reports/custom_report.md
-```
-
-**Debug mode:**
-```bash
-python cli.py generate --config config/generator.yaml --log-level DEBUG
+python cli.py generate --log-level DEBUG
 ```
 
 ## 📁 Project Structure
@@ -213,7 +209,34 @@ Quality Statistics:
 └── Average Attempts: 1.3
 ```
 
-## 🎯 Design Decisions
+## 🔄 Recent Improvements (v1.1.0)
+
+### Quality System Enhancements
+- **Progressive Quality Scaling**: Dynamic thresholds (1.0x to 1.5x) based on corpus size
+- **Bug Fixes**: Resolved NoneType scoring errors and improved error handling
+- **Robust Generation**: Better fallback mechanisms for API failures
+
+### Generation Capabilities
+- **Scaled Generation**: Now supports 200 reviews with 30-review batches
+- **Visual Progress**: Enhanced CLI with Unicode progress bars (█░)
+- **Provider Balance**: 60% OpenAI / 40% DeepSeek distribution
+
+### Performance
+- **Faster Iteration**: Configurable regeneration attempts (default: 1)
+- **Cleaner Output**: Suppressed verbose HTTP logging
+- **Memory Efficient**: Optimized similarity calculations
+
+## 🎯 Personas Included
+
+1. **H&S Coordinator** (beginner, 15%) - Focus on simplicity and support
+2. **Sales Training Facilitator** (intermediate, 20%) - Emphasis on engagement and deadlines
+3. **Instructional Designer** (intermediate, 15%) - Values learner engagement
+4. **Innovation Engineer** (intermediate, 15%) - Analytical, integration-focused
+5. **Consultant** (intermediate, 10%) - Results-focused, practical approach
+6. **Training Specialist** (expert, 15%) - Workflow efficiency and quality
+7. **Lecturer/Learning Designer** (expert, 10%) - Planning and organization
+
+
 
 ### Multi-Provider Architecture
 - **Rationale**: Reduces single-point-of-failure and enables cost optimization
@@ -231,25 +254,24 @@ Quality Statistics:
 - **Rationale**: Provides objective quality assessment baseline
 - **Trade-off**: Manual curation effort vs validation accuracy
 
-## ⚠️ Limitations
+## ⚠️ Current Limitations
 
-### Technical Limitations
-- **Dependency on External APIs**: OpenAI provider requires internet and API access
-- **Local Model Performance**: Ollama performance varies significantly by hardware
-- **Memory Usage**: Large datasets may require significant RAM for analysis
-- **Processing Time**: Quality control adds 2-3x generation time
+### Technical
+- **API Dependencies**: Requires valid OpenAI and DeepSeek API keys
+- **Rate Limiting**: API providers may have rate limits for batch generation
+- **Memory Usage**: Large datasets (200+ reviews) require significant RAM
+- **Processing Time**: Quality control adds 2-3x generation time (can be reduced)
 
-### Model Limitations
-- **LLM Consistency**: Different models produce varying quality and style
-- **Context Length**: Limited by model context windows (typically 2K-4K tokens)
-- **Domain Knowledge**: Models may lack deep domain expertise
-- **Temporal Awareness**: Generated reviews may not reflect current tool versions
+### Model & Quality
+- **Provider Variability**: OpenAI and DeepSeek produce different styles
+- **Context Length**: Limited to 500 token outputs per review
+- **Marketing Detection**: Marketing language scoring not yet implemented
+- **Semantic Variance**: Minor non-determinism in embeddings (~0.001 variance)
 
-### Quality Limitations
-- **Semantic Analysis Accuracy**: Embeddings may not capture nuanced meaning differences
-- **Bias Detection Scope**: Limited to statistical patterns, may miss subtle biases
-- **Realism Thresholds**: Configured thresholds may not suit all domains
-- **Human Evaluation Gap**: Automated metrics don't replace human judgment
+### Scope
+- **Domain-Specific**: Configured for Easygenerator reviews only
+- **Static Data**: Based on real reviews from January 2026
+- **Persona Limitation**: Cannot create new personas at runtime
 
 ## ⚖️ Ethical Considerations
 
@@ -312,62 +334,66 @@ flake8 . --max-line-length 100
 
 ## 🐛 Troubleshooting
 
-### Common Issues
+### Setup Issues
 
-**"No model providers available"**
-- Check API keys are set correctly
-- Verify Ollama is running (for local models)
-- Review provider configuration in YAML
+**"OPENAI_API_KEY not found"**
+- Export the key: `export OPENAI_API_KEY="sk-..."`
+- Or add to `.env` file (won't be committed to Git)
 
-**"Generation is very slow"**  
-- Consider using local models instead of API-based
-- Reduce quality thresholds
-- Disable expensive similarity calculations
+**"DeepSeek API authentication failed"**
+- Verify API key with DeepSeek
+- Check key format: `export DEEPSEEK_API_KEY="..."`
 
-**"High bias detected in report"**
-- Adjust temperature settings
-- Review persona configurations
-- Check rating distribution settings
+### Generation Issues
 
-**"Low realism scores"**
-- Add more domain-specific keywords
-- Adjust specificity thresholds
-- Review persona characteristics
+**"Generation is very slow"**
+- Use `--no-quality-control` for faster iteration
+- Reduce batch size in config (currently 30)
+- Check API rate limits and increase cooldown
+
+**"High similarity scores in output"**
+- **Expected**: Domain-specific content naturally has higher similarity
+- **Solution**: Progressive thresholds adjust automatically (0.45→0.7 at 200 reviews)
+- **Override**: Reduce `min_quality_score` in config to 0.1 for testing
+
+**"Quality scores are inconsistent between runs"**
+- **Cause**: Sentence transformer embeddings have minor variance
+- **Impact**: Score variance ~0.001 (negligible for quality decisions)
+- **Workaround**: Use bypass mode for reproducible development testing
 
 ### Debug Mode
-Enable debug logging to diagnose issues:
 ```bash
 python cli.py generate --log-level DEBUG
 ```
 
-## 📚 References
+## 📚 Resources
 
-### Academic Background
-- Jaccard Similarity for text diversity measurement
-- Jensen-Shannon Divergence for distribution comparison
-- Sentence transformers for semantic similarity analysis
-- Statistical bias detection methodologies
-
-### Related Tools
-- [OpenAI API](https://openai.com/api/) - Commercial LLM provider
-- [Ollama](https://ollama.ai/) - Local LLM deployment
-- [Sentence Transformers](https://huggingface.co/sentence-transformers) - Semantic embeddings
+### Dependencies Used
+- [OpenAI API](https://openai.com/api/) - GPT-4o-mini model provider
+- [DeepSeek API](https://api.deepseek.com) - DeepSeek chat model provider
+- [Sentence Transformers](https://huggingface.co/sentence-transformers) - Semantic embeddings (all-MiniLM-L6-v2)
 - [scikit-learn](https://scikit-learn.org/) - Machine learning utilities
+
+### Quality Methodology
+- Jaccard Similarity for text diversity measurement
+- Cosine similarity for semantic analysis
+- Statistical bias detection methodologies
+- Progressive threshold scaling for corpus size adaptation
 
 ## 📄 License
 
-This project is provided as-is for educational and research purposes. Please ensure compliance with all applicable terms of service when using external APIs and models.
+This project is provided as-is for educational and research purposes. Please ensure compliance with all applicable terms of service when using external APIs.
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Implement changes with tests
-4. Run quality checks (`black`, `flake8`, `pytest`)
-5. Submit a pull request
+4. Submit a pull request
 
 ---
 
-**Generated by:** Synthetic Review Generator v1.0.0  
-**Last Updated:** 2026-01-17  
-**Documentation Status:** ✅ Complete
+**Project**: Synthetic Review Generator for Easygenerator  
+**Version**: 1.1.0  
+**Last Updated**: 2026-01-19  
+**Status**: ✅ Production Ready
