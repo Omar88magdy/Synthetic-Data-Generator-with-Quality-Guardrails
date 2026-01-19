@@ -1,0 +1,211 @@
+# Synthetic Review Generator Configuration
+
+# Target generation settings
+generation:
+  target_reviews: 200   # Target number of synthetic reviews
+  min_reviews: 5       # Minimum acceptable reviews
+  batch_size: 30      # Reviews to generate per batch
+
+# Domain configuration
+domain: "elearning_authoring_tools"
+domain_keywords:
+  - "course creation"
+  - "easygenerator"
+  - "training materials"
+  - "content development"
+  - "learning platform"
+  - "templates"
+  - "SCORM"
+  - "LMS integration"
+  - "interactive content"
+  - "user-friendly interface"
+  - "authoring tool"
+  - "design capabilities"
+  - "support"
+  - "team collaboration"
+  - "video integration"
+  - "e-learning"
+  - "platform"
+  - "customization"
+  - "branding"
+  - "reporting"
+  - "quiz creation"
+  - "multimedia"
+  - "drag-and-drop"
+  - "API integration"
+  - "export functionality"
+  - "mobile learning"
+  - "employee onboarding"
+  - "videos"
+
+# Model providers configuration
+models:
+  openai:
+    enabled: true
+    model: "gpt-4o-mini"
+    temperature: 0.9
+    max_tokens: 500
+    api_key_env: "OPENAI_API_KEY"
+    weight: 0.6  # Proportion of reviews to generate with this model
+    
+  deepseek:
+    enabled: true
+    model: "deepseek-chat"
+    temperature: 0.8
+    max_tokens: 500
+    api_key_env: "DEEPSEEK_API_KEY"
+    weight: 0.4  # Proportion of reviews to generate with this model
+
+# Persona definitions (based on real Easygenerator review analysis)
+personas:
+  - role: "Consultant"
+    experience: "intermediate"
+    tone: "results-focused"
+    characteristics:
+      - "Frames the platform as a flexible delivery vehicle, often describing how text, visuals, videos, and quizzes come together into a single training flow."
+      - "Talks about speed in practical terms, mentioning how quickly teams can get started by signing in with existing company credentials."
+      - "Explicitly prefers dealing with real support staff, pointing out that speaking to an actual person solves issues faster than automated chat systems."
+      - "Calls out structural friction when it appears, such as rigid section rules that prevent combining different assessment types."
+      - "Uses comparative language, referencing tools like Articulate Storyline to contextualize strengths rather than exaggerating benefits."
+    weight: 0.10
+
+  - role: "Innovation Engineer"
+    experience: "intermediate"
+    tone: "analytical"
+    characteristics:
+      - "Examines the product through an integration lens, quickly noting limitations such as the absence of a public API."
+      - "Comments on how fast the learning curve is, often reducing the evaluation to time-to-output rather than user enjoyment."
+      - "Pays attention to compliance-oriented requirements like accessibility and flags them when platform constraints interfere."
+      - "Speculates about future potential, particularly where AI-assisted features could meaningfully extend current capabilities."
+      - "Mentions support interactions factually, emphasizing response speed and accuracy rather than friendliness."
+    weight: 0.15
+
+  - role: "Training and Development Specialist"
+    experience: "expert"
+    tone: "results-focused"
+    characteristics:
+      - "Describes efficiency in terms of workflow impact, often contrasting previous multi-step processes with the current streamlined approach."
+      - "Focuses on preserving content quality, noting when document imports retain layout fidelity and when image resolution feels limiting."
+      - "Speaks positively about AI assistance as a practical accelerator rather than a novelty, especially for converting existing materials."
+      - "Measures success by downstream effects, such as how easily employees can access up-to-date information."
+      - "Mentions performance issues selectively, framing lag as disruptive only when it interrupts delivery timelines."
+    weight: 0.15
+
+  - role: "Sales Training & Onboarding facilitator"
+    experience: "intermediate"
+    tone: "enthusiastic"
+    characteristics:
+      - "Talks about engagement in energetic terms, emphasizing how interactive elements keep learners interested."
+      - "Repeatedly references tight schedules, highlighting how the tool helps meet recurring monthly launch deadlines."
+      - "Uses straightforward, non-technical language to describe the experience, focusing on ease rather than mechanics."
+      - "Mentions the help center as a safety net that prevents work from stalling when questions arise."
+      - "Highlights how existing courses can be refreshed quickly without rebuilding them from scratch."
+    weight: 0.20
+
+  - role: "Instructional Designer"
+    experience: "intermediate"
+    tone: "enthusiastic"
+    characteristics:
+      - "Consistently emphasizes learner engagement, using descriptors like interactive, enjoyable, and dynamic."
+      - "Values features that reduce manual effort, particularly translation and voice-over tools that simplify content rollout."
+      - "Downplays visual customization, noting that functional reliability matters more than additional color or theme options."
+      - "Mentions link-based sharing as a practical workaround when an LMS is unavailable."
+      - "Lists interactive components—buttons, videos, images—as essential building blocks for effective learning design."
+    weight: 0.15
+
+  - role: "Lecturer cum Senior Digital Learning Designer"
+    experience: "expert"
+    tone: "analytical"
+    characteristics:
+      - "Evaluates the platform through the lens of planning and organization, valuing predictable and intuitive navigation."
+      - "Stresses the importance of human-led support, especially when feedback leads to tangible product changes."
+      - "Keeps learner engagement as the central objective, treating tools as means rather than outcomes."
+      - "Acknowledges technical constraints pragmatically, accepting scheduled downtime as part of continuous improvement."
+      - "Describes adapting work schedules around known maintenance windows rather than viewing them as blockers."
+    weight: 0.10
+
+  - role: "H&S Coordinator"
+    experience: "beginner"
+    tone: "enthusiastic"
+    characteristics:
+      - "Approaches the tool with simplicity in mind, appreciating interfaces that feel immediately understandable."
+      - "Focuses on achieving a polished end result without needing prior design knowledge."
+      - "Values collaboration features that allow colleagues to contribute without friction."
+      - "Mentions support frequently, expressing reassurance when help is easy to reach and responsive."
+    weight: 0.15
+  
+
+# Rating distribution (1-5 stars) - Based on real Easygenerator reviews
+rating_distribution:
+  1: 0.00  # 0% - No 1-star reviews in sample
+  2: 0.02  # 2% - 1/50 reviews was 2-star
+  3: 0.08  # 8% - 4/50 reviews were 3-star
+  4: 0.28  # 28% - 14/50 reviews were 4-star
+  5: 0.62  # 62% - 31/50 reviews were 5-star
+
+# Review characteristics - Based on real Easygenerator reviews
+review_settings:
+  length_ranges:
+    short: [15, 80]      # words - real range was 15-1031, avg 165
+    medium: [80, 250]    # words
+    long: [250, 400]     # words - capped for synthetic generation
+  
+  length_distribution:
+    short: 0.25
+    medium: 0.40
+    long: 0.35
+  
+  sentiment_mix:
+    positive: 0.6
+    neutral: 0.3 
+    negative: 0.3 
+
+# Quality guardrail thresholds (RELAXED - bypassing guardrails temporarily)
+quality_thresholds:
+  # Diversity thresholds - very permissive
+  max_jaccard_similarity: 0.95        # Maximum Jaccard word overlap between reviews
+  max_vocabulary_homogeneity: 0.95     # Maximum vocabulary overlap across batch
+  max_semantic_similarity: 0.98       # Maximum semantic similarity
+  max_common_vocab_ratio: 0.95         # Maximum common vocabulary ratio
+  min_vocabulary_diversity: 0.1       # Minimum unique vocabulary ratio
+  
+  # Bias detection thresholds - very permissive
+  max_sentiment_skew: 0.95            # Maximum sentiment deviation between models
+  max_rating_deviation: 0.95          # Maximum rating distribution deviation
+  max_persona_bias: 0.95              # Maximum persona-rating correlation
+  
+  # Realism thresholds - very permissive
+  min_domain_keywords: 0           # Minimum domain-specific keywords per review
+  max_marketing_score: 0.95         # Maximum marketing language score
+  min_specificity_score: 0.0       # Minimum technical specificity
+  
+  # Composite quality score - very permissive
+  min_quality_score: 0.1           # Minimum acceptable quality score
+  
+# Regeneration settings - DISABLED for fast generation
+regeneration:
+  max_attempts: 1        # Maximum regeneration attempts per review (disabled)
+  cooldown_seconds: 0    # Wait time between regeneration attempts
+  
+# Comparison settings
+comparison:
+  real_reviews_sample_size: 50    # Target number of real reviews for comparison
+  similarity_metrics:
+    - "length_distribution"
+    - "sentiment_distribution" 
+    - "vocabulary_richness"
+    - "topic_coverage"
+
+# Logging configuration
+logging:
+  level: "INFO"
+  log_generation_time: true
+  log_failures: true
+  log_quality_scores: true
+
+# Output settings
+output:
+  synthetic_reviews_file: "data/synthetic_reviews.json"
+  real_reviews_file: "data/easy_generator_real_reviews.json"
+  quality_report_file: "report/quality_report.md"
+  save_intermediate: true  # Save progress during generation

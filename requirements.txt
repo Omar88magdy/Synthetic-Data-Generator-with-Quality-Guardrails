@@ -1,0 +1,21 @@
+# Core dependencies
+numpy>=1.21.0
+PyYAML>=6.0
+requests>=2.28.0
+dataclasses-json>=0.5.7
+
+# Statistical analysis and machine learning
+scipy>=1.9.0
+scikit-learn>=1.1.0
+
+# Optional: Enhanced semantic analysis
+sentence-transformers>=2.2.0
+
+# Development and testing (optional)
+pytest>=7.0.0
+pytest-cov>=4.0.0
+black>=22.0.0
+flake8>=5.0.0
+
+# Documentation (optional)  
+markdown>=3.4.0
