@@ -208,24 +208,6 @@ Quality Statistics:
 ├── Final Pass Rate: 94.1%
 └── Average Attempts: 1.3
 ```
-
-## 🔄 Recent Improvements (v1.1.0)
-
-### Quality System Enhancements
-- **Progressive Quality Scaling**: Dynamic thresholds (1.0x to 1.5x) based on corpus size
-- **Bug Fixes**: Resolved NoneType scoring errors and improved error handling
-- **Robust Generation**: Better fallback mechanisms for API failures
-
-### Generation Capabilities
-- **Scaled Generation**: Now supports 200 reviews with 30-review batches
-- **Visual Progress**: Enhanced CLI with Unicode progress bars (█░)
-- **Provider Balance**: 60% OpenAI / 40% DeepSeek distribution
-
-### Performance
-- **Faster Iteration**: Configurable regeneration attempts (default: 1)
-- **Cleaner Output**: Suppressed verbose HTTP logging
-- **Memory Efficient**: Optimized similarity calculations
-
 ## 🎯 Personas Included
 
 1. **H&S Coordinator** (beginner, 15%) - Focus on simplicity and support
